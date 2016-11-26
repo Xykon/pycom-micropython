@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BOARD/delimiter=\:
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BOARD/operation=append
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BOARD/value=LOPY
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BTYPE/delimiter=\:
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BTYPE/operation=append
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/BTYPE/value=debug
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/IDF_PATH/delimiter=\:
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/IDF_PATH/operation=append
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/IDF_PATH/value=/home/ehlers/pycom/pycom-esp-idf
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.cross.base.1800587797/appendContributed=true
