@@ -7,9 +7,9 @@
  * available at https://www.pycom.io/opensource/licensing
  */
 
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef PYBDAC_H_
+#define PYBDAC_H_
 
-#define SW_VERSION_NUMBER                              "0.9.7.b1"
+extern const mp_obj_type_t pyb_dac_type;
 
-#endif /* VERSION_H_ */
+#endif /* PYBDAC_H_ */
