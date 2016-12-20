@@ -28,6 +28,25 @@ void config_init0 (void) {
     spi_flash_read(CONFIG_DATA_FLASH_ADDR, (void *)&pycom_config, sizeof(pycom_config));
 }
 
+bool config_set_heartbeat_color (const uint32_t *hbc) {
+    memcpy(pycom_config.heartbeat_color, hbc, sizeof(pycom_config.heartbeat_color));
+    return config_write();
+}
+
+void config_get_heartbeat_color (uint32_t *hbc) {
+    memcpy(hbc, pycom_config.heartbeat_color, sizeof(pycom_config.heartbeat_color));
+}
+
+bool config_set_error_color (const uint32_t *errc) {
+    memcpy(pycom_config.error_color, errc, sizeof(pycom_config.error_color));
+    return config_write();
+}
+
+void config_get_error_color (uint32_t *errc) {
+    memcpy(errc, pycom_config.error_color, sizeof(pycom_config.error_color));
+}
+
+
 bool config_set_lora_mac (const uint8_t *mac) {
     memcpy(pycom_config.lora_mac, mac, sizeof(pycom_config.lora_mac));
     return config_write();

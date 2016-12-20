@@ -82,12 +82,12 @@
 
 #if defined( USE_BAND_868 )
 #define LC4                                         { 867100000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC5                                         { 867300000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC6                                         { 867500000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC7                                         { 867700000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC8                                         { 867900000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
-#define LC9                                         { 868800000, { ( ( DR_7 << 4 ) | DR_7 ) }, 2 }
-#define LC10                                        { 868300000, { ( ( DR_6 << 4 ) | DR_6 ) }, 1 }
+//#define LC5                                         { 867300000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
+//#define LC6                                         { 867500000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
+//#define LC7                                         { 867700000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
+//#define LC8                                         { 867900000, { ( ( DR_5 << 4 ) | DR_0 ) }, 0 }
+//#define LC9                                         { 868800000, { ( ( DR_7 << 4 ) | DR_7 ) }, 2 }
+//#define LC10                                        { 868300000, { ( ( DR_6 << 4 ) | DR_6 ) }, 1 }
 #endif
 
 #define DEF_LORAWAN_NETWORK_ID                      0
@@ -577,12 +577,12 @@ static void TASK_LoRa (void *pvParameters) {
                    #if defined( USE_BAND_868 )
                        LoRaMacTestSetDutyCycleOn(false);            // TODO
                        LoRaMacChannelAdd(3, (ChannelParams_t)LC4);
-                       LoRaMacChannelAdd(4, (ChannelParams_t)LC5);
-                       LoRaMacChannelAdd(5, (ChannelParams_t)LC6);
-                       LoRaMacChannelAdd(6, (ChannelParams_t)LC7);
-                       LoRaMacChannelAdd(7, (ChannelParams_t)LC8);
-                       LoRaMacChannelAdd(8, (ChannelParams_t)LC9);
-                       LoRaMacChannelAdd(9, (ChannelParams_t)LC10);
+//                       LoRaMacChannelAdd(4, (ChannelParams_t)LC5);
+//                       LoRaMacChannelAdd(5, (ChannelParams_t)LC6);
+//                       LoRaMacChannelAdd(6, (ChannelParams_t)LC7);
+//                       LoRaMacChannelAdd(7, (ChannelParams_t)LC8);
+//                       LoRaMacChannelAdd(8, (ChannelParams_t)LC9);
+//                       LoRaMacChannelAdd(9, (ChannelParams_t)LC10);
                    #endif
 
                         // copy the configuration (must be done before sending the response)

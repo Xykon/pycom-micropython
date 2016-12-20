@@ -19,7 +19,9 @@
  ******************************************************************************/
 typedef struct {
     uint8_t lora_mac[8];
-    uint8_t dummy[56];
+    uint32_t heartbeat_color[1];
+    uint32_t error_color[1];
+    uint8_t dummy[48];
 
 } pycom_config_t;
 
@@ -31,5 +33,14 @@ void config_init0 (void);
 bool config_set_lora_mac (const uint8_t *mac);
 
 void config_get_lora_mac (uint8_t *mac);
+
+bool config_set_heartbeat_color (const uint32_t *hbc);
+
+void config_get_heartbeat_color (uint32_t *hbc);
+
+bool config_set_error_color (const uint32_t *errc);
+
+void config_get_error_color (uint32_t *errc);
+
 
 #endif /* PYCOM_CONFIG_H_ */

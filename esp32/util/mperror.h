@@ -15,8 +15,8 @@ extern const mp_obj_type_t pyb_heartbeat_type;
 extern void NORETURN __fatal_error(const char *msg);
 #endif
 
-#define MPERROR_HEARTBEAT_COLOR                     (0x50)          // blue
-#define MPERROR_FATAL_COLOR                         (0x500000)      // red
+#define MPERROR_HEARTBEAT_COLOR                     (0x5)          // blue
+#define MPERROR_FATAL_COLOR                         (0x100000)      // red
 
 void mperror_pre_init(void);
 void mperror_init0 (void);

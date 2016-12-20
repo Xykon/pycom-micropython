@@ -14,6 +14,7 @@
 #include "updater.h"
 
 #include "mpexception.h"
+#include "pycom_config.h"
 
 /******************************************************************************/
 // Micro Python bindings
@@ -34,6 +35,13 @@ STATIC mp_obj_t mod_pycom_rgb_led (mp_obj_t o_color) {
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_pycom_rgb_led_obj, mod_pycom_rgb_led);
+
+STATIC mp_obj_t mod_pycom_heartbeat_color (mp_obj_t o_color) {
+    uint32_t color = mp_obj_get_int(o_color);
+    config_set_heartbeat_color(&color);
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_pycom_heartbeat_color_obj, mod_pycom_heartbeat_color);
 
 STATIC mp_obj_t mod_pycom_ota_start (void) {
     if (!updater_start()) {
@@ -65,6 +73,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_0(mod_pycom_ota_finish_obj, mod_pycom_ota_finish)
 STATIC const mp_map_elem_t pycom_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__),            MP_OBJ_NEW_QSTR(MP_QSTR_pycom) },
     { MP_OBJ_NEW_QSTR(MP_QSTR_heartbeat),           (mp_obj_t)&mod_pycom_heartbeat_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_heartbeat_color),     (mp_obj_t)&mod_pycom_heartbeat_color_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_rgbled),              (mp_obj_t)&mod_pycom_rgb_led_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_ota_start),           (mp_obj_t)&mod_pycom_ota_start_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_ota_write),           (mp_obj_t)&mod_pycom_ota_write_obj },
