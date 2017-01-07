@@ -61,10 +61,10 @@ extern void Cache_Flush(int);
 
 extern __attribute__((noreturn)) void mperror_fatal_error (void);
 
-void bootloader_main();
+static void bootloader_main();
 static void unpack_load_app(const esp_partition_pos_t *app_node);
-void print_flash_info(const esp_image_header_t* pfhdr);
-void set_cache_and_start_app(uint32_t drom_addr,
+static void print_flash_info(const esp_image_header_t* pfhdr);
+static void set_cache_and_start_app(uint32_t drom_addr,
     uint32_t drom_load_addr,
     uint32_t drom_size,
     uint32_t irom_addr,
@@ -73,6 +73,18 @@ void set_cache_and_start_app(uint32_t drom_addr,
     uint32_t entry_addr);
 static void update_flash_config(const esp_image_header_t* pfhdr);
 
+static void read_mac(uint8_t* mac)
+{
+    uint32_t mac_low = REG_READ(EFUSE_BLK0_RDATA1_REG);
+    uint32_t mac_high = REG_READ(EFUSE_BLK0_RDATA2_REG);
+
+    mac[0] = mac_high >> 8;
+    mac[1] = mac_high;
+    mac[2] = mac_low >> 24;
+    mac[3] = mac_low >> 16;
+    mac[4] = mac_low >> 8;
+    mac[5] = mac_low;
+}
 
 void IRAM_ATTR call_start_cpu0()
 {
@@ -224,7 +236,7 @@ static uint32_t bootloader_buf[1024];
 static IRAM_ATTR void calculate_signature (uint8_t *signature) {
     uint32_t total_len = 0;
     uint8_t mac[6];
-    system_efuse_read_mac(mac);
+    read_mac(mac);
 
     struct MD5Context md5_context;
 
@@ -318,13 +330,13 @@ static IRAM_ATTR bool ota_write_boot_info (boot_info_t *boot_info, uint32_t offs
 }
 
 /**
- *  @function :     pbootloader_main
+ *  @function :     bootloader_main
  *  @description:   entry function of 2nd bootloader
  *
  *  @inputs:        void
  */
 
-void bootloader_main()
+static void bootloader_main()
 {
     ESP_LOGI(TAG, "Espressif ESP32 2nd stage bootloader v. %s", BOOT_VERSION);
 
@@ -333,12 +345,13 @@ void bootloader_main()
     memset(&bs, 0, sizeof(bs));
 
     ESP_LOGI(TAG, "compile time " __TIME__ );
-    /* disable watch dog here */
+    /* disable the watchdog here */
     REG_CLR_BIT( RTC_CNTL_WDTCONFIG0_REG, RTC_CNTL_WDT_FLASHBOOT_MOD_EN );
     REG_CLR_BIT( TIMG_WDTCONFIG0_REG(0), TIMG_WDT_FLASHBOOT_MOD_EN );
     SPIUnlock();
 
-    if(esp_image_load_header(0x1000, &fhdr) != ESP_OK) {
+    ESP_LOGI(TAG, "loading bootloader header");
+    if(esp_image_load_header(0x1000, true, &fhdr) != ESP_OK) {
         ESP_LOGE(TAG, "failed to load bootloader header!");
         return;
     }
@@ -471,13 +484,13 @@ static void unpack_load_app(const esp_partition_pos_t* partition)
     uint32_t image_length;
 
     /* TODO: verify the app image as part of OTA boot decision, so can have fallbacks */
-    err = esp_image_basic_verify(partition->offset, &image_length);
+    err = esp_image_basic_verify(partition->offset, true, &image_length);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to verify app image @ 0x%x (%d)", partition->offset, err);
         return;
     }
 
-    if (esp_image_load_header(partition->offset, &image_header) != ESP_OK) {
+    if (esp_image_load_header(partition->offset, true, &image_header) != ESP_OK) {
         ESP_LOGE(TAG, "Failed to load app image header @ 0x%x", partition->offset);
         return;
     }
@@ -503,7 +516,7 @@ static void unpack_load_app(const esp_partition_pos_t* partition)
         esp_image_segment_header_t segment_header;
         uint32_t data_offs;
         if(esp_image_load_segment_header(segment, partition->offset,
-                                         &image_header, &segment_header,
+                                         &image_header, true, &segment_header,
                                          &data_offs) != ESP_OK) {
             ESP_LOGE(TAG, "failed to load segment header #%d", segment);
             return;
@@ -554,6 +567,32 @@ static void unpack_load_app(const esp_partition_pos_t* partition)
                  segment_header.load_addr, segment_header.data_len, segment_header.data_len, (load)?"load":(map)?"map":"");
 
         if (load) {
+
+            intptr_t sp, start_addr, end_addr;
+            ESP_LOGV(TAG, "bootloader_mmap data_offs=%08x data_len=%08x", data_offs, segment_header.data_len);
+
+            start_addr = segment_header.load_addr;
+            end_addr = start_addr + segment_header.data_len;
+
+            /* Before loading segment, check it doesn't clobber
+               bootloader RAM... */
+
+            if (end_addr < 0x40000000) {
+                sp = (intptr_t)get_sp();
+                if (end_addr > sp) {
+                    ESP_LOGE(TAG, "Segment %d end address %08x overlaps bootloader stack %08x - can't load",
+                         segment, end_addr, sp);
+                    return;
+                }
+                if (end_addr > sp - 256) {
+                    /* We don't know for sure this is the stack high water mark, so warn if
+                       it seems like we may overflow.
+                    */
+                    ESP_LOGW(TAG, "Segment %d end address %08x close to stack pointer %08x",
+                             segment, end_addr, sp);
+                }
+            }
+
             const void *data = bootloader_mmap(data_offs, segment_header.data_len);
             if(!data) {
                 ESP_LOGE(TAG, "bootloader_mmap(0x%xc, 0x%x) failed",
@@ -574,7 +613,7 @@ static void unpack_load_app(const esp_partition_pos_t* partition)
         image_header.entry_addr);
 }
 
-void set_cache_and_start_app(
+static void set_cache_and_start_app(
     uint32_t drom_addr,
     uint32_t drom_load_addr,
     uint32_t drom_size,
@@ -646,7 +685,7 @@ static void update_flash_config(const esp_image_header_t* pfhdr)
     Cache_Read_Enable( 0 );
 }
 
-void print_flash_info(const esp_image_header_t* phdr)
+static void print_flash_info(const esp_image_header_t* phdr)
 {
 #if (BOOT_LOG_LEVEL >= BOOT_LOG_LEVEL_NOTICE)
 
