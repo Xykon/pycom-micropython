@@ -38,20 +38,26 @@ APP_INC += -I$(ESP_IDF_COMP_PATH)/nvs_flash/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/spi_flash/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/tcpip_adapter/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/log/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/sdmmc/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/device/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/dm
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/hh
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/sys/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gatt/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/gap/include
+APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/stack/l2cap/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btcore/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/osi/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/hci/include
-APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/bta/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/gki/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/api/include
 APP_INC += -I$(ESP_IDF_COMP_PATH)/bt/bluedroid/btc/include
 APP_INC += -I../lib/mp-readline
 APP_INC += -I../lib/netutils
-APP_INC += -I../lib/timeutils
 APP_INC += -I../lib/fatfs
 APP_INC += -I../lib
 APP_INC += -I../drivers/sx127x
@@ -89,12 +95,13 @@ APP_LIB_SRC_C = $(addprefix lib/,\
 	libm/atan2f.c \
 	mp-readline/readline.c \
 	netutils/netutils.c \
-	timeutils/timeutils.c \
 	utils/pyexec.c \
+	utils/interrupt_char.c \
 	fatfs/ff.c \
 	fatfs/option/ccsbcs.c \
 	)
 
+ifeq ($(BOARD), LOPY)
 APP_MODS_SRC_C = $(addprefix mods/,\
 	machuart.c \
 	machpin.c \
@@ -113,13 +120,49 @@ APP_MODS_SRC_C = $(addprefix mods/,\
 	modpycom.c \
 	moduhashlib.c \
 	moducrypto.c \
+	machtimer.c \
+	machtimer_alarm.c \
+	machtimer_chrono.c \
 	analog.c \
 	pybadc.c \
 	pybdac.c \
+	pybsd.c \
 	modussl.c \
 	modbt.c \
+	modled.c \
 	)
+endif
 
+ifeq ($(BOARD), WIPY)
+APP_MODS_SRC_C = $(addprefix mods/,\
+	machuart.c \
+	machpin.c \
+	machrtc.c \
+	machspi.c \
+	machine_i2c.c \
+	machpwm.c \
+	modmachine.c \
+	moduos.c \
+	modusocket.c \
+	modnetwork.c \
+	modwlan.c \
+	moduselect.c \
+	modutime.c \
+	modpycom.c \
+	moduhashlib.c \
+	moducrypto.c \
+	machtimer.c \
+	machtimer_alarm.c \
+	machtimer_chrono.c \
+	analog.c \
+	pybadc.c \
+	pybdac.c \
+	pybsd.c \
+	modussl.c \
+	modbt.c \
+	modled.c \
+	)
+endif
 
 APP_STM_SRC_C = $(addprefix stmhal/,\
 	bufhelper.c \
@@ -132,6 +175,7 @@ APP_STM_SRC_C = $(addprefix stmhal/,\
 
 APP_UTIL_SRC_C = $(addprefix util/,\
 	antenna.c \
+	btdynmem.c \
 	gccollect.c \
 	help.c \
 	mperror.c \
@@ -141,10 +185,12 @@ APP_UTIL_SRC_C = $(addprefix util/,\
 	socketfifo.c \
 	mpirq.c \
 	mpsleep.c \
+	timeutils.c \
 	)
 
 APP_FATFS_SRC_C = $(addprefix fatfs/src/,\
 	drivers/sflash_diskio.c \
+	drivers/sd_diskio.c \
 	option/syscall.c \
 	diskio.c \
 	ffconf.c \
@@ -152,7 +198,6 @@ APP_FATFS_SRC_C = $(addprefix fatfs/src/,\
 
 APP_LORA_SRC_C = $(addprefix lora/,\
 	utilities.c \
-	rtc-board.c \
 	timer-board.c \
 	gpio-board.c \
 	spi-board.c \
@@ -162,7 +207,6 @@ APP_LORA_SRC_C = $(addprefix lora/,\
 
 APP_LIB_LORA_SRC_C = $(addprefix lib/lora/,\
 	mac/LoRaMac.c \
-	mac/LoRaMac-api-v3.c \
 	mac/LoRaMacCrypto.c \
 	system/delay.c \
 	system/gpio.c \

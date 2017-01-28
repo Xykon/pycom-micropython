@@ -2,14 +2,14 @@ Pycom documentation and references
 ========================================
 
 .. toctree::
-
+	:numbered:
+	
     pycom_esp32/getstarted
-    pycom_esp32/underhood.rst
-    pycom_esp32/hardware.rst
-    pycom_esp32/general.rst
-    MicroPython library reference<library/index.rst>
-    pycom_esp32/tutorial/index.rst
-    license.rst
+    pycom_esp32/toolsandfeatures
+    pycom_esp32/tutorial/index
+    library/index
+    pycom_esp32/datasheets
+    license
 
 Indices and tables
 ==================

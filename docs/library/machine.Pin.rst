@@ -94,7 +94,7 @@ Constructors
    ::
 
         from machine import Pin
-        p = machine.Pin('P10', mode=Pin.OUT, pull=None, alt=-1)
+        p = Pin('P10', mode=Pin.OUT, pull=None, alt=-1)
 
 
 Methods
@@ -229,6 +229,46 @@ Methods
 
         Get or set the pin pull.
 
+    .. method:: pin.hold([hold])
+
+        Get or set the pin hold. Can be used to retain the pin state through a core reset and
+        system reset triggered by watchdog time-out or Deep-sleep events.
+
+.. only:: port_pycom_esp32
+
+    .. method:: pin.callback(trigger, handler=None, arg=None)
+
+        Set a callback to be triggered when the input level at the pin changes.
+
+            - ``trigger`` is the type of event that triggers the callback. Possible values are:
+
+                - ``Pin.IRQ_FALLING`` interrupt on falling edge.
+                - ``Pin.IRQ_RISING`` interrupt on rising edge.
+                - ``Pin.IRQ_LOW_LEVEL`` interrupt on low level.
+                - ``Pin.IRQ_HIGH_LEVEL`` interrupt on high level.
+
+              The values can be *ORed* together, for instance trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING
+
+            - ``handler`` is the function to be called when the event happens. This function will receive one argument.
+              Set ``handler`` to ``None`` to disable it.
+
+            - ``arg`` is an optional argument to pass to the callback. If left empty or set to ``None``,
+              the function will receive the ``Pin`` object that triggered it.
+
+        Example::
+
+            from machine import Pin
+
+            def pin_handler(arg):
+                print("got an interrupt in pin %s" % (arg.id()))
+
+            p_in = Pin('P10', mode=Pin.IN, pull=Pin.PULL_UP)
+            p_in.callback(Pin.IRQ_FALLING | Pin.IRQ_RISING, pin_handler)
+
+        .. note::
+
+            For more information on how Pycom's products handle interrupts, see :ref:`here<pycom_interrupt_handling>`.
+
 .. only:: port_wipy
 
     .. method:: Pin.irq(\*, trigger, priority=1, handler=None, wake=None)
@@ -255,7 +295,7 @@ Methods
                 ``GP11``, GP17`` or ``GP24`` can wake the board. Note that only 1
                 of this pins can be enabled as a wake source at the same time, so, only
                 the last enabled pin as a ``machine.Sleep.SUSPENDED`` wake source will have effect.
-              - If ``wake_from=machine.Sleep.SUSPENDED`` pins ``GP2``, ``GP4``, ``GP10``,
+              - If ``wake_from=machine.Sleep.HIBERNATE`` pins ``GP2``, ``GP4``, ``GP10``,
                 ``GP11``, ``GP17`` and ``GP24`` can wake the board. In this case all of the
                 6 pins can be enabled as a ``machine.Sleep.HIBERNATE`` wake source at the same time.
               - Values can be ORed to make a pin generate interrupts in more than one power

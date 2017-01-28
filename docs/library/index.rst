@@ -1,5 +1,7 @@
-MicroPython libraries
-=====================
+.. _firmware_api_reference:
+
+4. Firmware API Reference
+==========================
 
 This chapter describes modules (function and class libraries) which are built
 into MicroPython. There are a few categories of modules:
@@ -30,13 +32,44 @@ modules from the Python standard library, as well as further MicroPython
 extensions to it, can be found in the `micropython-lib repository
 <https://github.com/micropython/micropython-lib>`_.
 
-Python standard libraries and micro-libraries
----------------------------------------------
+4.1 Pycom Modules
+-----------------
 
-The following standard Python libraries have been "micro-ified" to fit in with
-the philosophy of MicroPython.  They provide the core functionality of that
-module and are intended to be a drop-in replacement for the standard Python
-library.
+ .. toctree::
+    :maxdepth: 1
+
+    machine.rst
+    machine.ADC.rst
+    machine.DAC.rst
+    machine.I2C.rst
+    machine.Pin.rst
+    machine.PWM.rst
+    machine.RTC.rst
+    machine.SPI.rst
+    machine.UART.rst
+    machine.WDT.rst
+    machine.Timer.rst
+    machine.SD.rst
+    network.rst
+    network.WLAN.rst
+    network.Server.rst
+    network.Bluetooth.rst
+    network.LoRa.rst
+    network.Sigfox.rst
+    ucrypto.AES.rst
+    pycom.rst
+
+
+4.2 Micropython libraries
+-------------------------
+
+The following list contains the standard Python libraries, MicroPython-specific
+libraries and Pycom specific modules that are available on our boards.
+
+The standard Python libraries have been "micro-ified" to fit in with the philosophy
+of MicroPython. They provide the core functionality of that module and are intended
+to be a drop-in replacement for the standard Python library.
+
 
 .. only:: not port_unix and not port_pycom_esp32
 
@@ -116,13 +149,18 @@ library.
 
 .. only:: port_lopy or port_2wipy or port_pycom_esp32
 
+
+
     .. toctree::
        :maxdepth: 1
 
-       builtins.rst
+       micropython.rst
+       uctypes.rst
        sys.rst
        uos.rst
        array.rst
+       cmath.rst
+       math.rst
        gc.rst
        ubinascii.rst
        ujson.rst
@@ -132,6 +170,22 @@ library.
        utime.rst
        uhashlib.rst
        ussl.rst
+       ucrypto.rst
+       ustruct.rst
+       thread.rst
+       builtins.rst
+
+
+    .. only:: port_pycom_esp32
+
+        .. note::
+
+            Some modules are available by an u-name, and also by their non-u-name.  The
+            non-u-name can be overridden by a file of that name in your package path.
+            For example, ``import json`` will first search for a file ``json.py`` or
+            directory ``json`` and load that package if it is found.  If nothing is found,
+            it will fallback to loading the built-in ``ujson`` module.
+
 
 .. only:: port_esp8266
 
@@ -157,26 +211,10 @@ library.
        utime.rst
        uzlib.rst
 
-
-MicroPython-specific libraries
-------------------------------
-
-Functionality specific to the MicroPython implementation is available in
-the following libraries.
-
-.. toctree::
-   :maxdepth: 1
-
-   machine.rst
-   micropython.rst
-   network.rst
-   uctypes.rst
-
-
 .. only:: port_pyboard
 
-   Libraries specific to the pyboard
-   ---------------------------------
+   4.3 Libraries specific to the pyboard
+   --------------------------------------
 
    The following libraries are specific to the pyboard.
 
@@ -187,8 +225,8 @@ the following libraries.
 
 .. only:: port_wipy
 
-   Libraries specific to the WiPy
-   ---------------------------------
+   4.3 Libraries specific to the WiPy
+   -----------------------------------
 
    The following libraries are specific to the WiPy.
 
@@ -197,35 +235,11 @@ the following libraries.
 
       wipy.rst
 
-.. only:: port_lopy or port_2wipy or port_pycom_esp32
-
-    Libraries specific to the Pycom modules
-    ---------------------------------------
-
-    The following libraries are specific to the Pycom modules.
-
-    .. toctree::
-        :maxdepth: 1
-
-        pycom.treading.rst
-        pycom.rst
-        ucrypto.rst
-
-
-    .. only:: port_pycom_esp32
-
-        .. note::
-
-            Some modules are available by an u-name, and also by their non-u-name.  The
-            non-u-name can be overridden by a file of that name in your package path.
-            For example, ``import json`` will first search for a file ``json.py`` or
-            directory ``json`` and load that package if it is found.  If nothing is found,
-            it will fallback to loading the built-in ``ujson`` module.
 
 .. only:: port_esp8266
 
-   Libraries specific to the ESP8266
-   ---------------------------------
+   4.3 Libraries specific to the ESP8266
+   -------------------------------------
 
    The following libraries are specific to the ESP8266.
 
@@ -233,3 +247,29 @@ the following libraries.
       :maxdepth: 2
 
       esp.rst
+
+
+.. raw:: html
+
+    <script type="text/javascript">
+    function removeModules(elements,toRemove){
+      el = document.querySelectorAll(elements)
+      console.log("Removing from "+elements+" (found "+el.length+" items)")
+      for(var i=0;i<el.length;i++){
+          for(var j=0;j<toRemove.length;j++){
+              key = toRemove[j]
+              if(el[i].innerHTML.indexOf(key) > -1){
+                  console.log(" > Found "+key+", removing now")
+                  el[i].className += " hidden"
+              }
+          }
+      }
+    }
+
+    var toRemove = ['Channel','BluetoothConnection','BluetoothService','BluetoothCharacteristic']
+
+    removeModules('#pycom-modules blockquote div ul li',toRemove)
+
+    removeModules('.toctree-l1.current ul .toctree-l2.current ul li',toRemove)
+
+    </script>
